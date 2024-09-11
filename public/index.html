@@ -17,6 +17,7 @@
         const signin=async ()=>{
             const username=document.getElementById("signin-username").value;
             const password=document.getElementById("signin-password").value;
+
             const response=await axios.post("http://localhost:3000/signin", {
                 username: username,
                 password: password
@@ -33,39 +34,53 @@
         const userInfo=async()=>{
             const token=localStorage.getItem("token");
             if (token){
-                const response=await axios.get("http://localhost:3000/me", {
+                try{
+                    const response=await axios.get("http://localhost:3000/me", {
                     headers:{
                         Authorization: token
                     }
                 })
-                document.getElementById("info").innerHTML=response.data.username;
-                document.getElementById("info").innerHTML=response.data.password;
+                document.getElementById("info").innerHTML= `username: ${response.data.username}
+                    <br>                                        password: ${response.data.password}`
+                }catch(err){
+                    console.log("Error : ", err);
+                }
             }else{
-                console.log("No one is signed in")
+                document.getElementById("info").innerHTML="Please sign up";
             }
         };
         document.addEventListener("DOMContentLoaded", ()=>{
             userInfo()
         });
+        const showUI=async ()=>{
+            const token=localStorage.getItem("token");
+            if (token){
+                document.getElementById("user-out-section").style="display: block;";
+                document.getElementById("sign-section").style="display: none;";
+            }
+        };
+        document.addEventListener("DOMContentLoaded", ()=>{
+            showUI();
+        });
     </script>
     <body>
-        <div>
-            SignUp
-            <input type="text" name="Username" id="signup-username" placeholder="username">
-            <input type="text" name="Password" id="signup-password" placeholder="password">
-            <button onclick="signup()">Sign Up</button>
+        <div id="sign-section" style="display: block;">
+            <div>
+                SignUp
+                <input type="text" name="Username" id="signup-username" placeholder="username">
+                <input type="text" name="Password" id="signup-password" placeholder="password">
+                <button onclick="signup()">Sign Up</button>
+            </div>
+            <div>
+                SignIn
+                <input type="text" name="Username" id="signin-username" placeholder="username">
+                <input type="text" name="Password" id="signin-password" placeholder="password">
+                <button onclick="signin()">Sign In</button>
+            </div>
         </div>
-        <div></div>
-            SignIn
-            <input type="text" name="Username" id="signin-username" placeholder="username">
-            <input type="text" name="Password" id="signin-password" placeholder="password">
-            <button onclick="signin()">Sign In</button>
-        </div>
-        <div>
+        <div id="user-out-section" style="display: none;">
             User Information:
             <div id="info"></div>
-        </div>
-        <div>
             <button onclick="logout()">Log Out</button>
         </div>
     </body>
